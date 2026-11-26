@@ -22,6 +22,8 @@ import '../../../jam/presentation/screens/jam_topics_screen.dart';
 import '../../../roleplay/domain/services/roleplay_module_detection.dart';
 import '../../../roleplay/presentation/screens/roleplay_home_screen.dart';
 import '../../domain/entities/activity_detail.dart';
+import '../../domain/activity_access_messages.dart';
+import '../../domain/entities/activity_progress_semantics.dart';
 import '../controllers/activity_detail_controller.dart';
 import '../controllers/adjacent_activities_controller.dart';
 import '../widgets/assessment_card.dart';
@@ -52,7 +54,12 @@ class ActivityDetailScreen extends ConsumerWidget {
         children: [
           switch (state) {
             AsyncData(value: final data) => _ActivityDetailContent(data: data),
-            AsyncError(:final error) when error is ForbiddenFailure => _LockedState(message: error.message),
+            // A role mismatch (employer/recruiter session on a student page) is
+            // not a plan lock: no upgrade prompt — a plain message with Retry
+            // (handled by the generic branch below). Every other Forbidden
+            // keeps the existing locked state.
+            AsyncError(:final error) when error is ForbiddenFailure && error.message != activityRoleMismatchMessage =>
+              _LockedState(message: error.message),
             AsyncError(:final error) when error is! UnauthorizedFailure => AppErrorView(
               message: error is Failure ? error.message : 'Something went wrong. Please try again.',
               onRetry: () => ref.read(provider.notifier).retry(),
@@ -251,10 +258,17 @@ class _HeroBanner extends StatelessWidget {
                   context,
                 ).textTheme.headlineSmall?.copyWith(color: AppColors.accent, fontWeight: FontWeight.w800),
               ),
+              // CB 3.0 shows a SCORE percentage (`detail.html:86`); the
+              // previous web showed completion.
               Text(
-                'Complete',
+                data.progressSemantics == ActivityProgressSemantics.score ? 'Score' : 'Complete',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white.withValues(alpha: 0.65)),
               ),
+              if (data.attemptedExercises != null && data.totalExercises != null)
+                Text(
+                  '${data.attemptedExercises}/${data.totalExercises} exercises',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white.withValues(alpha: 0.65)),
+                ),
             ],
           ),
         ],

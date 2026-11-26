@@ -1,0 +1,113 @@
+<!-- Fixture derived from the rendered shape of Career_Buddy_LMS/templates/activities/sub_activity.html (previous web). Sanitized: generic titles, no real accounts. Offline test data only. -->
+<div class="sub-activity-hero bg-indigo">
+        <div class="container py-4">
+            <nav aria-label="breadcrumb" class="mb-2">
+                <ol class="breadcrumb breadcrumb-light mb-0">
+                    <li class="breadcrumb-item"><a href="/activities/">Activities</a></li>
+                    <li class="breadcrumb-item"><a href="/activities/4/">Business Vocabulary</a></li>
+                    <li class="breadcrumb-item active">Meeting Phrases</li>
+                </ol>
+            </nav>
+            <div class="d-flex align-items-center gap-3 mt-2">
+                <div>
+                    <div class="text-white-50 small">Sub-Activity 2 of 3</div>
+                    <h2 class="text-white mb-0">Meeting Phrases</h2>
+                </div>
+                <div class="ms-auto">
+                    <span class="badge bg-warning text-dark px-3 py-2">
+                        <i class="fas fa-spinner me-1"></i>In Progress
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container py-5">
+        <p class="mb-0"><span id="descOverview">Phrases for meetings.</span></p>
+        <div class="instructions-text" id="instructionsBox"><p>Read each phrase.</p>
+<p>Then try the exercises.</p></div>
+        <h5 class="fw-bold mb-3"><span id="headingExercises">Interactive Exercises</span></h5>
+        <div class="exercises-grid">
+                    <div class="exercise-card">
+                        <div class="exercise-card-left">
+                            <div class="exercise-type-icon exercise-mcq">
+                                <i class="fas fa-list-ul"></i>
+                            </div>
+                        </div>
+                        <div class="exercise-card-body">
+                            <div class="exercise-type-label">Multiple Choice</div>
+                            <h6 class="exercise-title">Vocabulary Quiz</h6>
+                            <p class="exercise-instructions text-muted small mb-2">Do it.</p>
+                            <div class="exercise-last-score">
+                                <i class="fas fa-trophy text-warning me-1"></i>
+                                Last score: <strong>7/10</strong>
+                                <span class="ms-2 badge bg-warning text-dark">
+                                    70%
+                                </span>
+                            </div>
+                        </div>
+                        <div class="exercise-card-action">
+                            <a href="/activities/exercise/501/" class="btn btn-primary btn-sm">
+                                <i class="fas fa-play me-1"></i>Start
+                            </a>
+                        </div>
+                    </div>
+                    <div class="exercise-card">
+                        <div class="exercise-card-left">
+                            <div class="exercise-type-icon exercise-fill_blank">
+                                <i class="fas fa-list-ul"></i>
+                            </div>
+                        </div>
+                        <div class="exercise-card-body">
+                            <div class="exercise-type-label">Fill in the Blank</div>
+                            <h6 class="exercise-title">Fill the Gaps</h6>
+                            <p class="exercise-instructions text-muted small mb-2">Do it.</p>
+                        </div>
+                        <div class="exercise-card-action">
+                            <a href="/activities/exercise/502/" class="btn btn-primary btn-sm">
+                                <i class="fas fa-play me-1"></i>Start
+                            </a>
+                        </div>
+                    </div>
+                    <div class="exercise-card">
+                        <div class="exercise-card-left">
+                            <div class="exercise-type-icon exercise-ordering">
+                                <i class="fas fa-list-ul"></i>
+                            </div>
+                        </div>
+                        <div class="exercise-card-body">
+                            <div class="exercise-type-label">Ordering</div>
+                            <h6 class="exercise-title">Order the Steps</h6>
+                            <p class="exercise-instructions text-muted small mb-2">Do it.</p>
+                        </div>
+                        <div class="exercise-card-action">
+                            <a href="/activities/exercise/503/" class="btn btn-primary btn-sm">
+                                <i class="fas fa-play me-1"></i>Start
+                            </a>
+                        </div>
+                    </div>
+        </div>
+                <div class="mark-complete-card mt-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="fas fa-clipboard-check fa-2x text-success"></i>
+                        <div>
+                            <h6 class="mb-1">Finished this sub-activity?</h6>
+                            <p class="text-muted mb-0 small">
+                                <span class="text-danger"><i class="fas fa-lock me-1"></i>Please complete all interactive exercises first.</span>
+                            </p>
+                        </div>
+                        <form method="post" action="/activities/sub/35/complete/" class="ms-auto">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="FIXTURE_TOKEN">
+                            <button type="submit" class="btn btn-success" disabled title="Complete all exercises to unlock this button">
+                                <i class="fas fa-check me-2"></i>Mark Complete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+        <div class="activity-nav mt-4">
+            <a href="/activities/4/sub/34/" class="btn btn-outline-secondary">Common Business Terms</a>
+            <a href="/activities/4/sub/36/" class="btn btn-outline-primary">Email Vocabulary</a>
+        </div>
+        <a href="/activities/4/sub/34/" class="sub-nav-item "><span class="sub-nav-num">1</span><span class="sub-nav-title">Common Business Terms</span></a>
+        <a href="/activities/4/sub/35/" class="sub-nav-item sub-nav-active"><span class="sub-nav-num">2</span><span class="sub-nav-title">Meeting Phrases</span></a>
+    </div>

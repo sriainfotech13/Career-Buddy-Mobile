@@ -4,6 +4,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
+import '../../domain/entities/activity_progress_semantics.dart';
 import '../../domain/entities/activity_summary.dart';
 
 /// Mirrors the web activity list's card — `templates/activities/list.html`:
@@ -23,19 +24,46 @@ class ActivityCard extends StatelessWidget {
   /// hides the badge.
   final int? activityNumber;
 
+  bool get _isScore => activity.progressSemantics == ActivityProgressSemantics.score;
+
+  /// Anything attempted/progressed. CB 3.0 shows the progress block whenever
+  /// an exercise was attempted (`list.html:117`, `p.attempted`) — even at a
+  /// 0% score — while the previous web showed it only above 0%.
+  bool get _hasProgress => activity.completionRate > 0 || (_isScore && (activity.attemptedExercises ?? 0) > 0);
+
+  /// CB 3.0: "done" means every exercise was ATTEMPTED; only a 100% score is a
+  /// perfect "Review", anything lower offers "Improve Score"
+  /// (`list.html:145-152`). Legacy: done = 100% = "Review Activity".
   String get _ctaLabel {
     if (activity.isLocked) return 'Locked';
-    if (activity.isCompleted) return 'Review Activity';
-    if (activity.completionRate > 0) return 'Continue';
+    if (activity.isCompleted) {
+      // "Improve Score" only for a KNOWN score below 100. A missing
+      // percentage (placeholder 0) must not be read as a low score, and a
+      // score below 100 is not a failure — the button just opens the activity
+      // (same destination as every other label); no retry is promised.
+      return (_isScore && activity.hasProgressPercent && activity.completionRate < 100)
+          ? 'Improve Score'
+          : 'Review Activity';
+    }
+    if (_hasProgress) return 'Continue';
     return 'Start Activity';
   }
 
-  /// `list.html:143-149` — the icon changes with the same three states as
-  /// the label (`fa-redo`/`fa-play`/`fa-arrow-right`).
+  /// `list.html:143-149` — the icon changes with the same states as the label.
   IconData get _ctaIcon {
     if (activity.isCompleted) return Icons.replay;
-    if (activity.completionRate > 0) return Icons.play_arrow;
+    if (_hasProgress) return Icons.play_arrow;
     return Icons.arrow_forward;
+  }
+
+  /// CB 3.0 bar colour tiers (`progress.py`: >=80 success, >=50 warning, else
+  /// danger); legacy: success when done, otherwise the action colour.
+  Color get _barColor {
+    if (!_isScore) return activity.isCompleted ? AppColors.success : AppColors.action;
+    final r = activity.completionRate;
+    if (r >= 80) return AppColors.success;
+    if (r >= 50) return AppColors.warning;
+    return r > 0 ? AppColors.danger : AppColors.textMuted;
   }
 
   @override
@@ -78,25 +106,38 @@ class ActivityCard extends StatelessWidget {
                 _Badge(label: activity.categoryDisplay, type: _BadgeType.category),
               ],
             ),
-            if (activity.completionRate > 0) ...[
+            if (_hasProgress) ...[
               const SizedBox(height: AppSpacing.sm),
-              Row(
-                children: [
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: activity.completionRate / 100,
-                        minHeight: 6,
-                        backgroundColor: AppColors.border,
-                        color: activity.isCompleted ? AppColors.success : AppColors.action,
+              // The bar and percentage only when the page showed a percentage
+              // (never a placeholder 0%).
+              if (activity.hasProgressPercent)
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: activity.completionRate / 100,
+                          minHeight: 6,
+                          backgroundColor: AppColors.border,
+                          color: _barColor,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text('${activity.completionRate}%', style: Theme.of(context).textTheme.bodySmall),
-                ],
-              ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      _isScore ? 'Score ${activity.completionRate}%' : '${activity.completionRate}%',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              // CB 3.0 `a/b exercises attempted` (`list.html:128-130`) — only
+              // when the page showed it; "attempted" is not "passed".
+              if (activity.attemptedExercises != null && activity.totalExercises != null)
+                Text(
+                  '${activity.attemptedExercises}/${activity.totalExercises} exercises attempted',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+                ),
             ],
             const SizedBox(height: AppSpacing.sm),
             // `list.html:135-151`: a real, full-width button either way —
@@ -166,4 +207,3 @@ class _Badge extends StatelessWidget {
     );
   }
 }
-

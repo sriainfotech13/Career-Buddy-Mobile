@@ -22,8 +22,9 @@ final class MarkCompleteFailed extends MarkCompleteState {
   final Failure failure;
 }
 
-/// Drives the web's "Mark Complete" form
-/// (`templates/activities/sub_activity.html:157-179`). This controller
+/// Drives the PREVIOUS web's "Mark Complete" form
+/// (`templates/activities/sub_activity.html:157-179`; removed in CB 3.0, where
+/// completion is automatic — the UI only offers this for legacy markup). This controller
 /// only tracks the submit action's own transient state — whether the
 /// sub-activity IS now completed is never guessed client-side; on success
 /// it invalidates `SubActivityDetailController`, so the screen's "completed"
@@ -38,6 +39,12 @@ class MarkSubCompleteController extends Notifier<MarkCompleteState> {
 
   Future<void> submit() async {
     if (state is MarkCompleteSubmitting) return;
+    // Never send a completion request for a non-positive id (the old `-1`
+    // sentinel): fail locally, without touching the repository/network.
+    if (key.subActivityId <= 0) {
+      state = const MarkCompleteFailed(UnexpectedFailure('This sub-activity cannot be marked complete.'));
+      return;
+    }
     state = const MarkCompleteSubmitting();
     final result = await ref.read(activitiesRepositoryProvider).markSubComplete(key.subActivityId);
     switch (result) {

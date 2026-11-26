@@ -78,6 +78,10 @@ class SubActivityTile extends StatelessWidget {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           StatusBadge(status: subActivity.status),
+                          // CB 3.0 `Score N%` badge — only when the page
+                          // showed one (never a defaulted 0%).
+                          if (subActivity.scorePercent != null)
+                            Text('Score ${subActivity.scorePercent}%', style: Theme.of(context).textTheme.bodySmall),
                           Text(
                             '${subActivity.exerciseCount} '
                             'Exercise${subActivity.exerciseCount == 1 ? '' : 's'}',

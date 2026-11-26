@@ -26,6 +26,8 @@ import '../../../generic_writing/presentation/generic_writing_route_args.dart';
 import '../../../matching/presentation/matching_route_args.dart';
 import '../../../timer_exercise/presentation/timer_exercise_route_args.dart';
 import '../../domain/entities/sub_activity_detail.dart';
+import '../../domain/activity_access_messages.dart';
+import '../../domain/entities/sub_activity_status.dart';
 import '../controllers/mark_sub_complete_controller.dart';
 import '../controllers/sub_activity_detail_controller.dart';
 import '../controllers/sub_activity_siblings_controller.dart';
@@ -63,7 +65,12 @@ class SubActivityDetailScreen extends ConsumerWidget {
         children: [
           switch (state) {
             AsyncData(value: final data) => _SubActivityDetailContent(data: data),
-            AsyncError(:final error) when error is ForbiddenFailure => _LockedState(message: error.message),
+            // A role mismatch (employer/recruiter session on a student page) is
+            // not a plan lock: no upgrade prompt — a plain message with Retry
+            // (handled by the generic branch below). Every other Forbidden
+            // keeps the existing locked state.
+            AsyncError(:final error) when error is ForbiddenFailure && error.message != activityRoleMismatchMessage =>
+              _LockedState(message: error.message),
             AsyncError(:final error) when error is! UnauthorizedFailure => AppErrorView(
               message: error is Failure ? error.message : 'Something went wrong. Please try again.',
               onRetry: () => ref.read(provider.notifier).retry(),
@@ -314,10 +321,23 @@ class _SubActivityDetailContent extends ConsumerWidget {
           const SizedBox(height: AppSpacing.sm),
         ],
         MarkCompleteSection(
+          mode: data.completionMode,
           allExercisesDone: data.allExercisesDone,
           completedAt: data.completedAt,
           state: markCompleteState,
-          onSubmit: () => ref.read(markSubCompleteControllerProvider((activityId: data.activityId, subActivityId: data.id)).notifier).submit(),
+          scorePercent: data.scorePercent,
+          attemptedExercises: data.attemptedExercises,
+          totalExercises: data.totalExercises,
+          isFullyAttempted: data.status == SubActivityStatus.completed,
+          // A completion request is only ever possible for legacy markup with
+          // a valid positive id (`canMarkComplete`); otherwise the button is
+          // inert (and the controller refuses a non-positive id anyway).
+          onSubmit: () {
+            if (!data.canMarkComplete) return;
+            ref
+                .read(markSubCompleteControllerProvider((activityId: data.activityId, subActivityId: data.id)).notifier)
+                .submit();
+          },
         ),
         const SizedBox(height: AppSpacing.md),
         SubActivityNavigationBar(
@@ -334,7 +354,8 @@ class _SubActivityDetailContent extends ConsumerWidget {
           onSelect: (id) => context.pushReplacement(RoutePaths.subActivityDetail(data.activityId, id)),
         ),
         if (siblings.isNotEmpty) const SizedBox(height: AppSpacing.md),
-        const LearningTipsCard(),
+        // Only advertise "Mark complete" where that action is verified to exist.
+        LearningTipsCard(manualCompletionAvailable: data.canMarkComplete && data.completedAt == null),
       ],
     );
   }

@@ -1,3 +1,4 @@
+import 'activity_progress_semantics.dart';
 import 'sub_activity_summary.dart';
 
 class ActivityDetail {
@@ -13,6 +14,9 @@ class ActivityDetail {
     required this.isModule,
     required this.completionRate,
     required this.subActivities,
+    this.progressSemantics = ActivityProgressSemantics.completion,
+    this.attemptedExercises,
+    this.totalExercises,
   });
 
   final int id;
@@ -38,4 +42,11 @@ class ActivityDetail {
   /// Percentage, 0-100.
   final int completionRate;
   final List<SubActivitySummary> subActivities;
+
+  /// Whether [completionRate] is a completion or a score percentage.
+  final ActivityProgressSemantics progressSemantics;
+
+  /// CB 3.0 hero ring `a/b exercises`; null when not shown.
+  final int? attemptedExercises;
+  final int? totalExercises;
 }
