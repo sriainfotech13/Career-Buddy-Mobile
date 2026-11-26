@@ -93,7 +93,7 @@ class _DashboardContent extends StatelessWidget {
       children: [
         _WelcomeBanner(username: username, onBrowseActivities: () => context.push(RoutePaths.activities)),
         const SizedBox(height: AppSpacing.lg),
-        DashboardStatsRow(stats: data.stats),
+        DashboardStatsRow(stats: data.stats, scoreBased: data.generation == DashboardMarkupGeneration.cb3),
         const SizedBox(height: AppSpacing.lg),
         if (tablet)
           Row(

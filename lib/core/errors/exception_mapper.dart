@@ -16,6 +16,7 @@ abstract final class ExceptionMapper {
         ValidationException(fieldErrors: final errors, message: final msg) => ValidationFailure(errors, msg),
         ServerException() => const ServerFailure(),
         UnexpectedResponseException() => const UnexpectedFailure(),
+        PageFormatChangedException(message: final msg) => PageFormatChangedFailure(msg),
         EmployerProfileIncompleteException(message: final msg) => EmployerProfileIncompleteFailure(msg),
         CameraRequiredException(message: final msg) => CameraRequiredFailure(msg),
         MalpracticeTerminatedException(message: final msg) => MalpracticeTerminatedFailure(msg),

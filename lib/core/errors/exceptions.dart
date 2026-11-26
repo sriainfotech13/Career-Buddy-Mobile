@@ -116,3 +116,15 @@ final class ResumeBuilderSignInRequiredException extends AppException {
     super.message = 'Please sign in to use Resume Parsing & Interview.',
   ]);
 }
+
+/// A page that was reached successfully (authenticated, right role, HTTP
+/// 200) but whose HTML no longer matches the structure this app's parser
+/// was written against — e.g. the web team changed a template. Kept
+/// distinct from [UnauthorizedException] so a parser/markup mismatch is
+/// never mistaken for an expired session: it must not clear cookies, log
+/// the user out, or redirect to sign-in. The UI offers Retry instead.
+final class PageFormatChangedException extends AppException {
+  const PageFormatChangedException([
+    super.message = 'This page looks different than the app expects. Your session is still active — please try again.',
+  ]);
+}

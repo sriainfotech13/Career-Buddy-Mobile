@@ -63,3 +63,12 @@ final class MalpracticeTerminatedFailure extends Failure {
 final class ResumeBuilderSignInRequiredFailure extends Failure {
   const ResumeBuilderSignInRequiredFailure(super.message);
 }
+
+/// See `PageFormatChangedException`'s doc comment. Deliberately NOT an
+/// [UnauthorizedFailure]: screens that log out on an expired session must
+/// not log out on this.
+final class PageFormatChangedFailure extends Failure {
+  const PageFormatChangedFailure([
+    super.message = 'This page looks different than the app expects. Your session is still active — please try again.',
+  ]);
+}

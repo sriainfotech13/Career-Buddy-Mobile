@@ -10,17 +10,28 @@ import '../../domain/entities/dashboard_stats.dart';
 /// Mirrors the web dashboard's 4-tile stats row (Total Activities,
 /// Completed, In Progress, Total Score) — `dashboard.html:65-94`.
 class DashboardStatsRow extends StatelessWidget {
-  const DashboardStatsRow({required this.stats, super.key});
+  const DashboardStatsRow({required this.stats, this.scoreBased = false, super.key});
 
   final DashboardStats stats;
+
+  /// True when the page is the CB 3.0 score-based dashboard. There the
+  /// "Completed" count means every exercise was *attempted* — regardless of
+  /// the score (`activities/views.py:229-236`, `progress.py`) — so the tile is
+  /// labelled accordingly instead of implying a pass or a perfect score.
+  final bool scoreBased;
 
   @override
   Widget build(BuildContext context) {
     final tiles = [
-      _StatTile(label: 'Total Activities', value: '${stats.totalActivities}', icon: Icons.menu_book_outlined),
-      _StatTile(label: 'Completed', value: '${stats.completedCount}', icon: Icons.check_circle_outline),
-      _StatTile(label: 'In Progress', value: '${stats.inProgressCount}', icon: Icons.trending_up),
-      _StatTile(label: 'Total Score', value: '${stats.totalScore}', icon: Icons.star_outline),
+      // A tile the page did not render shows "-", never a fabricated 0.
+      _StatTile(label: 'Total Activities', value: _display(stats.totalActivities), icon: Icons.menu_book_outlined),
+      _StatTile(
+        label: scoreBased ? 'Fully Attempted' : 'Completed',
+        value: _display(stats.completedCount),
+        icon: Icons.check_circle_outline,
+      ),
+      _StatTile(label: 'In Progress', value: _display(stats.inProgressCount), icon: Icons.trending_up),
+      _StatTile(label: 'Total Score', value: _display(stats.totalScore), icon: Icons.star_outline),
     ];
 
     final tablet = isTablet(context);
@@ -39,6 +50,8 @@ class DashboardStatsRow extends StatelessWidget {
     );
   }
 }
+
+String _display(num? value) => value == null ? '-' : '$value';
 
 /// `.stat-card-blue/green/orange/purple` each define a distinct gradient
 /// (`static/css/style.css:1314-1328`), but the site's later "BLACK & GOLD

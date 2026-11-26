@@ -4,6 +4,12 @@ import 'payment_record.dart';
 import 'recent_result.dart';
 import 'recommended_job.dart';
 
+/// Which dashboard template generation the page was rendered from, detected
+/// from the page's own markers (never assumed). [cb3] means score-based
+/// progress (`dashboard.html:171-213`); [legacy] means the previous web's
+/// completion-based `N/M sub-activities` markup.
+enum DashboardMarkupGeneration { legacy, cb3, unknown }
+
 /// Aggregate of everything the dashboard screen renders — mirrors
 /// `dashboard()`'s context dict in `activities/views.py` (see
 /// `docs/BACKEND_CONTRACT_dashboard.md` for the proposed wire format).
@@ -15,6 +21,7 @@ class DashboardData {
     required this.recommendedJobs,
     required this.paymentHistory,
     this.interviewScore,
+    this.generation = DashboardMarkupGeneration.unknown,
   });
 
   final DashboardStats stats;
@@ -29,4 +36,5 @@ class DashboardData {
   /// conditional card.
   final List<PaymentRecord> paymentHistory;
   final num? interviewScore;
+  final DashboardMarkupGeneration generation;
 }
